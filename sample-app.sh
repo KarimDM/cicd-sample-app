@@ -1,5 +1,10 @@
 #!/bin/bash
 set -euo pipefail
+if [ "$(docker ps -aq -f name=samplerunning)" ]; then
+    echo "Container samplerunning already exists! Removing container now!"
+    docker stop samplerunning
+    docker rm samplerunning
+fi
 
 mkdir -p tempdir
 mkdir -p tempdir/templates
@@ -18,7 +23,6 @@ COPY  sample_app.py /home/myapp/
 EXPOSE 5050
 CMD python /home/myapp/sample_app.py
 _EOF_
-
 cd tempdir || exit
 docker build -t sampleapp .
 docker run -t -d -p 5050:5050 --name samplerunning sampleapp
